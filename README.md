@@ -1,3 +1,536 @@
+# Algorithm Lab Project
+
+> **Laboratorio per il corso di Algoritmi e Strutture Dati**
+> University lab project for the Algorithms and Data Structures course. Implements fundamental algorithms and data structures from scratch in C and Java, without relying on native language collections or external libraries.
+
+---
+
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Repository Structure](#repository-structure)
+- [Prerequisites](#prerequisites)
+- [Exercise 1 — Sorting Algorithms (C)](#exercise-1--sorting-algorithms-c)
+- [Exercise 2 — Skip List (C)](#exercise-2--skip-list-c)
+- [Exercise 3 — Generic Min Heap (Java)](#exercise-3--generic-min-heap-java)
+- [Exercise 4 — Graph & Dijkstra's Algorithm (Java)](#exercise-4--graph--dijkstras-algorithm-java)
+- [C EXs — Alternative C Implementations](#c-exs--alternative-c-implementations)
+- [Code Quality Standards](#code-quality-standards)
+- [Original Course Specification](#original-course-specification)
+
+---
+
+## Project Overview
+
+This repository contains four exam exercises for an Algorithms and Data Structures lab course. Each exercise implements a specific algorithm or data structure from scratch:
+
+| Exercise | Language | Topic |
+|----------|----------|-------|
+| 1 | C | Sorting algorithms (Insertion Sort, Quick Sort variants) |
+| 2 | C | Skip List data structure |
+| 3 | Java | Generic Min Heap |
+| 4 | Java | Directed/Undirected Graph + Dijkstra's shortest path |
+
+The folder `C EXs - Other solutions` contains alternative C implementations for Exercises 1 and 2, each using slightly different architectural approaches.
+
+---
+
+## Repository Structure
+
+```
+Algorithm-Lab-Project/
+│
+├── exercise_1/                      # Sorting Algorithms — C
+│   └── src/
+│       ├── sort_array.h             # Public API declarations
+│       ├── sort_array.c             # Algorithm implementations
+│       ├── sort_array_tests.c       # Unit tests (Unity framework)
+│       ├── main.c                   # Entry point (reads records.csv)
+│       ├── Makefile
+│       └── unity.{c,h,internals.h} # Unity testing framework
+│
+├── exercise_2/                      # Skip List — C
+│   ├── skiplist.h                   # Struct definitions & API
+│   ├── skiplist.c                   # Skip list implementation
+│   ├── Skiplist_test.c              # Unit tests (Unity framework)
+│   ├── main.c                       # Entry point (spell-checker demo)
+│   ├── Makefile
+│   └── unity.{c,h,internals.h}
+│
+├── exercise_3/                      # Generic Min Heap — Java
+│   ├── src/
+│   │   ├── MinHeap.java             # Core heap implementation
+│   │   ├── MinHeapException.java    # Custom exception
+│   │   ├── IntComparator.java       # Integer comparator
+│   │   ├── StrComparator.java       # String comparator
+│   │   ├── MinHeapMain.java         # Demo entry point
+│   │   ├── MinHeapUsage.java        # Usage examples
+│   │   ├── MinHeapTests.java        # JUnit test suite
+│   │   └── MinHeapTestRunner.java   # Test runner
+│   ├── lib/
+│   │   ├── junit-4.13.2.jar
+│   │   └── hamcrest-core-1.3.jar
+│   └── README.md                    # Compilation instructions
+│
+├── exercise_4/                      # Graph + Dijkstra — Java
+│   ├── src/
+│   │   ├── Graph.java               # Generic adjacency-list graph
+│   │   ├── Edge.java                # Weighted directed edge
+│   │   ├── ShortestPathFinder.java  # Dijkstra's algorithm
+│   │   ├── DijkastraApp.java        # Entry point
+│   │   ├── FileUtils.java           # CSV graph loader
+│   │   ├── MinHeap.java             # Min Heap (reused from Ex 3)
+│   │   ├── MinHeapException.java
+│   │   └── GraphTest.java           # JUnit test suite
+│   ├── lib/
+│   │   ├── junit-4.13.2.jar
+│   │   └── hamcrest-core-1.3.jar
+│   └── README.md
+│
+├── C EXs - Other solutions/         # Alternative C implementations
+│   ├── EX1/src/                     # Alternative sorting solution
+│   │   ├── structure.{h,c}          # Generic dynamic array wrapper
+│   │   ├── sort_lib.{h,c}           # Sorting library
+│   │   ├── Main.c                   # Entry point
+│   │   ├── Main_test.c              # Unit tests
+│   │   └── Makefile
+│   ├── EX2/src/                     # Alternative skip list solution
+│   │   ├── skiplist.{h,c}           # Extended skip list (+ spell-checker)
+│   │   ├── Main.c
+│   │   ├── Main_test.c
+│   │   └── Makefile
+│   └── Resources/C/Unity/           # Shared Unity testing framework
+│       └── unity.{c,h,internals.h}
+│
+├── skiplist.png                     # Skip list visualization
+├── Relazione Progetto Algoritmi e Strutture Dati.pdf  # Project report (IT)
+├── FAQ.md
+├── Git.md
+└── UnitTesting.md
+```
+
+---
+
+## Prerequisites
+
+### C exercises (1, 2 and C EXs)
+- GCC compiler (`gcc`)
+- `make`
+
+### Java exercises (3, 4)
+- JDK 8 or later (`javac`, `java`)
+- JUnit 4.13.2 and Hamcrest 1.3 (pre-bundled in each exercise's `lib/` folder)
+
+---
+
+## Exercise 1 — Sorting Algorithms (C)
+
+**Location:** `exercise_1/src/`
+
+### Description
+
+Generic sorting library implemented in C using `void**` arrays and comparator function pointers, enabling sorting of any data type without language-level generics.
+
+### Algorithms Implemented
+
+| Function | Strategy | Pivot | Average Complexity |
+|----------|----------|-------|--------------------|
+| `b_insertion_sort` | Binary Insertion Sort | — | O(n²) |
+| `quick_sort_Hoares` | Quick Sort — Hoare's partition | First element | O(n log n) |
+| `quick_sort_Hoares_r` | Quick Sort — Hoare's partition | Random element | O(n log n) |
+| `quick_sort_Lomuto` | Quick Sort — Lomuto partition | Last element | O(n log n) |
+
+#### Binary Insertion Sort
+Uses a recursive binary search (`binary_search`) to find the correct insertion position in the already-sorted prefix, reducing the number of comparisons (but not the number of shifts).
+
+#### Quick Sort — Hoare's Partition (fixed pivot)
+Pivot is always `base[low]`. Two pointers scan inward; elements are swapped when the invariant is violated.
+
+#### Quick Sort — Hoare's Partition (random pivot)
+Same as above but the pivot is chosen at random within `[low, high]` and swapped to position `low` before partitioning. This avoids worst-case O(n²) on already-sorted input.
+
+#### Quick Sort — Lomuto Partition
+Pivot is `base[high]`. A single forward scan maintains a boundary `i` between elements `≤ pivot` and `> pivot`.
+
+### API
+
+```c
+// sort_array.h
+
+// Binary Insertion Sort — O(n²), stable
+void b_insertion_sort(void **base, size_t n_elem, int (*cmpr)(void *, void *));
+
+// Quick Sort, Hoare partition, fixed pivot (first element)
+void quick_sort_Hoares(void **base, int low, int high, int (*cmpr)(void *, void *));
+
+// Quick Sort, Hoare partition, random pivot
+void quick_sort_Hoares_r(void **base, int low, int high, int (*cmpr)(void *, void *));
+
+// Quick Sort, Lomuto partition, last-element pivot
+void quick_sort_Lomuto(void **base, int low, int high, int (*cmpr)(void *, void *));
+```
+
+### Build & Run
+
+```bash
+cd exercise_1/src
+
+# Build and run unit tests
+make test
+make runtest
+
+# Build and run main program (reads records.csv)
+make main
+make runmain          # expects ../records.csv
+```
+
+---
+
+## Exercise 2 — Skip List (C)
+
+**Location:** `exercise_2/`
+
+### Description
+
+A probabilistic data structure that allows O(log n) average-case search, insertion, and deletion. The structure maintains multiple "express lanes" on top of a sorted linked list, with each higher level skipping over more elements.
+
+![Skip List](skiplist.png)
+
+### Data Structures
+
+```c
+struct _Node {
+    Node    **next;      // Array of forward pointers, one per level
+    unsigned int size;   // Height of this node
+    void    *item;       // Stored element (generic via void*)
+};
+
+struct _Skiplist {
+    Node        *head;       // Sentinel head node (MAX_HEIGHT levels)
+    unsigned int max_level;  // Current highest non-empty level
+    int (*compare)(void *, void *);  // User-supplied comparator
+};
+```
+
+`MAX_HEIGHT` is set to **30**, giving a maximum of 2³⁰ ≈ 1 billion elements with efficient height distribution.
+
+### API
+
+```c
+// skiplist.h
+
+// Create an empty skip list; comparator must return <0, 0, or >0
+Skiplist *skipList_create(int (*compare)(void *, void *));
+
+// Insert item into the list in sorted order — O(log n) average
+void insertSkiplist(Skiplist *list, void *item);
+
+// Search for item — returns pointer to item or NULL — O(log n) average
+void *searchSkipList(Skiplist *list, void *item);
+
+// Free all allocated memory
+void skiplist_free(Skiplist *list);
+```
+
+### Level Generation
+
+Each new node is assigned a height by repeatedly flipping a coin (50 % probability) until tails, up to `MAX_HEIGHT`. This gives a geometric distribution that ensures the expected number of nodes at each level halves as the level increases.
+
+### Build & Run
+
+```bash
+cd exercise_2
+
+# Build and run unit tests
+make test
+make runtest
+
+# Build and run main program (spell-checker demo)
+make main
+make runmain          # expects dictionary.txt and correctme.txt
+```
+
+---
+
+## Exercise 3 — Generic Min Heap (Java)
+
+**Location:** `exercise_3/src/`
+
+### Description
+
+A generic minimum heap backed by a resizable array. The heap accepts any type `T` along with a `Comparator<? super T>` so that the ordering strategy is fully decoupled from the data type.
+
+### Key Class: `MinHeap<T>`
+
+```java
+public class MinHeap<T> {
+    MinHeap(int capacity, Comparator<? super T> comparator)
+
+    void insert(T element)              // Add element; trickle up — O(log n)
+    T    extract_min()                  // Remove & return minimum — O(log n)
+    void decrease_element(int i, T val) // Decrease key at index i — O(log n)
+    int  size()                         // Current number of elements
+    boolean is_empty()
+}
+```
+
+The array doubles in capacity automatically when full (`grow()`).
+
+### Heap Operations
+
+| Operation | Implementation | Complexity |
+|-----------|---------------|------------|
+| `insert` | Append + `trickle_up` | O(log n) |
+| `extract_min` | Swap root with last + `trickle_down` | O(log n) |
+| `decrease_element` | Replace + `trickle_up` | O(log n) |
+| Index navigation | `parent = (i-1)/2`, `left = 2i+1`, `right = 2i+2` | O(1) |
+
+### Comparators Provided
+
+| Class | Compares |
+|-------|---------|
+| `IntComparator` | `Integer` values |
+| `StrComparator` | `String` values (lexicographic) |
+
+### Build & Run
+
+Navigate to `exercise_3/src/` first.
+
+**Linux / macOS**
+```bash
+# Compile all sources
+javac -cp '.:../lib/junit-4.13.2.jar:../lib/hamcrest-core-1.3.jar' *.java
+
+# Run unit tests
+java -cp '.:../lib/junit-4.13.2.jar:../lib/hamcrest-core-1.3.jar' MinHeapTestRunner
+
+# Run demo
+java -cp '.' MinHeapMain
+```
+
+**Windows** (replace `:` with `;`)
+```bat
+javac -cp ".;..\lib\junit-4.13.2.jar;..\lib\hamcrest-core-1.3.jar" MinHeapTestRunner.java
+java  -cp ".;..\lib\junit-4.13.2.jar;..\lib\hamcrest-core-1.3.jar" MinHeapTestRunner
+```
+
+---
+
+## Exercise 4 — Graph & Dijkstra's Algorithm (Java)
+
+**Location:** `exercise_4/src/`
+
+### Description
+
+A generic weighted graph implemented with an adjacency list, paired with Dijkstra's shortest-path algorithm that uses the `MinHeap` from Exercise 3 as its priority queue.
+
+### Components
+
+#### `Graph<L, E>` — Generic Adjacency-List Graph
+
+```java
+// L = vertex label type, E = edge weight type
+// Both must implement Comparable<L> / Comparable<E>
+Graph(boolean isOriented)          // directed or undirected graph
+
+void   addVertex(L v)
+void   addEdge(Edge<L, E> e)
+void   removeVertex(L v)
+void   removeEdge(Edge<L, E> e)
+Set<L> getVertices()
+List<Edge<L,E>> getAdjVerticesOf(L v)
+E      getEdgeWeight(L v1, L v2)
+boolean containsVertex(L v)
+boolean containsEdge(Edge<L,E> e)
+int    numVertices()
+int    numEdges()
+```
+
+Internal storage: `Map<L, LinkedList<Edge<L,E>>> adjList`.  
+For undirected graphs `addEdge` inserts both directions automatically.
+
+#### `Edge<T, K>` — Weighted Directed Edge
+
+```java
+Edge(T vertex1, T vertex2, K weight)
+T getVertex1()
+T getVertex2()
+K getWeight()
+int compareTo(Edge<T,K> other)  // compares by weight
+```
+
+#### `ShortestPathFinder<L>` — Dijkstra's Algorithm
+
+```java
+ShortestPathFinder(Graph<L, Double> graph)
+
+void dijkstra(L source)   // Run algorithm from 'source'
+void printSolution()      // Print distances to all vertices
+void printPath(L dest)    // Print shortest path to 'dest'
+```
+
+**Algorithm outline:**
+1. Initialise `dist[v] = ∞` for all `v`; `dist[source] = 0`.
+2. Insert all vertices into a `MinHeap` keyed by distance.
+3. While the heap is non-empty:
+   - Extract vertex `u` with minimum distance.
+   - For each neighbour `v` of `u`, **relax** the edge `(u, v)`:
+     - If `dist[u] + w(u,v) < dist[v]`, update `dist[v]`, update parent `π[v] = u`, and call `decrease_element` on the heap.
+4. Time complexity: **O((V + E) log V)** with a binary heap.
+
+#### `FileUtils` — CSV Graph Loader
+
+```java
+static void GraphCSV(Graph<String, Double> g, String path)
+```
+
+Reads a CSV file where each line is `city1,city2,distance_km` and populates the graph. Used with the Italian city distance dataset (`italian_dist_graph.csv`).
+
+#### `DijkastraApp` — Entry Point
+
+```java
+Graph<String, Double> g = new Graph<>(false);   // undirected
+FileUtils.GraphCSV(g, "../italian_dist_graph.csv");
+ShortestPathFinder<String> sp = new ShortestPathFinder<>(g);
+sp.dijkstra("torino");
+sp.printSolution();
+```
+
+### Build & Run
+
+Navigate to `exercise_4/src/` first.
+
+**Linux / macOS**
+```bash
+javac -cp '.:../lib/junit-4.13.2.jar:../lib/hamcrest-core-1.3.jar' *.java
+
+# Run tests
+java -cp '.:../lib/junit-4.13.2.jar:../lib/hamcrest-core-1.3.jar' GraphTest
+
+# Run application (requires italian_dist_graph.csv one level up)
+java -cp '.' DijkastraApp
+```
+
+**Windows**
+```bat
+javac -cp ".;..\lib\junit-4.13.2.jar;..\lib\hamcrest-core-1.3.jar" .\GraphTest.java
+java  -cp ".;..\lib\junit-4.13.2.jar;..\lib\hamcrest-core-1.3.jar" GraphTest
+```
+
+---
+
+## C EXs — Alternative C Implementations
+
+**Location:** `C EXs - Other solutions/`
+
+This folder contains alternative C implementations of Exercises 1 and 2. They share the same algorithmic goals but adopt a different code architecture.
+
+### EX1 — Alternative Sorting Implementation
+
+**Location:** `C EXs - Other solutions/EX1/src/`
+
+Key difference from `exercise_1`: sorting operates on a **`Structure`** wrapper type — a generic dynamic array — rather than a raw `void**` pointer, providing a more object-oriented interface.
+
+#### `structure.{h,c}` — Generic Dynamic Array
+
+```c
+typedef struct { void **data; int size; int capacity; } Structure;
+
+Structure *structureNew(int capacity);
+void  structureInsert(Structure *s, void *item);
+void  structureDelete(Structure *s, int index);
+void *structureGet(Structure *s, int index);
+```
+
+#### `sort_lib.{h,c}` — Sorting on `Structure`
+
+Sorting functions take a `Structure*` instead of `void**`, keeping the container and algorithm cleanly separated.
+
+Also includes `readFile()` for loading records from a CSV file directly into a `Structure`.
+
+**Record type:**
+```c
+typedef struct {
+    int   id;
+    char *field1;
+    int   field2;
+    float field3;
+} Record;
+```
+
+#### Build & Run
+
+```bash
+cd "C EXs - Other solutions/EX1/src"
+
+make test && make runtest   # unit tests
+make main && make runmain   # main program (reads ./dataset/records.csv)
+```
+
+---
+
+### EX2 — Alternative Skip List Implementation
+
+**Location:** `C EXs - Other solutions/EX2/src/`
+
+An extended version of the skip list that adds file-loading helpers and a practical **spell-checker** application.
+
+#### Additional Functions vs. Exercise 2
+
+| Function | Description |
+|----------|-------------|
+| `newSkipList` | Alias for `skipList_create` |
+| `deleteSkipList` | Full memory deallocation |
+| `readFile1` | Load a word list from a text file into the skip list |
+| `checkPhrase` | Check each word of a phrase against the skip list dictionary |
+| `compareField1/2/3` | Comparators for string / int / float record fields |
+
+#### Spell-Checker Application
+
+```
+main <dictionary_file> <phrase_file>
+```
+
+1. Loads `dictionary_file` into the skip list (O(n log n)).
+2. Reads each word from `phrase_file`.
+3. Looks up every word (O(log n)); prints words not found in the dictionary.
+
+#### Build & Run
+
+```bash
+cd "C EXs - Other solutions/EX2/src"
+
+make test && make runtest   # unit tests
+make main && make runmain   # main program (reads dataset/dictionary.txt & correctme.txt)
+```
+
+#### Shared Testing Framework
+
+Both alternative exercises use the **Unity** C testing framework located in:
+```
+C EXs - Other solutions/Resources/C/Unity/
+```
+
+---
+
+## Code Quality Standards
+
+The following conventions apply to all source code in this repository:
+
+- **Indentation:** 2 spaces, no tabs
+- **Language:** English for all identifiers, comments, and documentation
+- **Naming:**
+  - Java: `camelCase` for methods/variables, `PascalCase` for classes
+  - C: `snake_case` for functions and variables, `UPPER_SNAKE_CASE` for constants/macros
+- **Function length:** maximum 30 lines per function/method
+- **Comments:** explain *why*, not *what*; avoid redundant comments
+- **No external data structures:** all required data structures are implemented from scratch; native collections (e.g., `java.util.PriorityQueue`, `qsort`) are not used where their manual implementation is the exercise goal
+- **Git hygiene:** frequent, atomic commits; no binary or data files committed
+
+---
+
+## Original Course Specification
+
 # Laboratorio per il corso di Algoritmi e Strutture Dati: regole d'esame, indicazioni generali e suggerimenti, consegne per gli esercizi
 
 # Regole d'esame
